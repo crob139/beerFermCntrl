@@ -72,9 +72,11 @@ void init(bool &fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
                             // n'th chamber's beer sensor
                             found = line.find("28");
                             chambers[i].setChamberSensorPath(temperatureValuePath + line.substr(found) + "/w1_slave", 0); // Beer Sensor Path
+                            chambers[i].setHasBeerSensor(true); // Set the chamber variable for checking if a beer sensor is available
                             break;
                         }
                     }
+                    continue;
                 }
 
                 // Get the chamber temperature sensor serial number
@@ -88,9 +90,11 @@ void init(bool &fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
                             // n'th chamber's chamber sensor
                             found = line.find("28");
                             chambers[i].setChamberSensorPath(temperatureValuePath + line.substr(found) + "/w1_slave", 1); // Chamber Sensor Path
+                            chambers[i].setHasFridgeSensor(true); // Set the chamber variable for checking if a chamber sensor is available
                             break;
                         }
                     }
+                    continue;
                 }
 
                 // Get the chamber temperature sensor serial number
@@ -104,9 +108,11 @@ void init(bool &fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
                             // n'th chamber's ambient sensor
                             found = line.find("28");
                             chambers[i].setChamberSensorPath(temperatureValuePath + line.substr(found) + "/w1_slave", 2); // Ambient Sensor Path
+                            chambers[i].setHasAmbientSensor(true); // Set the chamber variable for checking if an ambient sensor is available
                             break;
                         }
                     }
+                    continue;
                 }
 
                 // Determine if we are using celsius or fahrenheit
@@ -128,6 +134,7 @@ void init(bool &fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
                             break;
                         }
                     }
+                    continue;
                 }
             }
         }
@@ -137,7 +144,82 @@ void init(bool &fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
     {
         cout << "ERROR: Failed to open main.ini file!" << endl;
     }
+    
+    for (int i = 0; i < NUM_OF_FERM_CHAMBERS; i++)
+    {
+        // Check
+        if ((!chambers[i].getHasBeerSensor()) && (!chambers[i].getHasFridgeSensor()))
+        {
+            cout << "ERROR: Chamber " << i << " doesn't have a beer or chamber temp sensor specified." << endl;
+            exit(EXIT_FAILURE);
+        }
+        
+        cout << "CHAMBER " << i << endl;
+        // Beer sensor serial
+        if (chambers[i].getHasBeerSensor())
+        {
+            cout << "    Beer Sensor: " << chambers[i].getChamberBeerSensorPath() << endl;
+        }
+        else
+        {
+            cout << "    Beer Sensor: None" << endl;
+        }
+        // Chamber sensor serial
+        if (chambers[i].getHasFridgeSensor())
+        {
+            cout << "    Chamber Sensor: " << chambers[i].getChamberFridgeSensorPath() << endl;
+        }
+        else
+        {
+            cout << "    Chamber Sensor: None" << endl;
+        }
+        // Ambient sensor serial
+        if (chambers[i].getHasAmbientSensor())
+        {
+            cout << "    Ambient Sensor: " << chambers[i].getChamberAmbientSensorPath() << endl;
+        }
+        else
+        {
+            cout << "    Ambient Sensor: None" << endl;
+        }
+        
+        cout << endl; // For formating
+    }
 }
+
+/*void getBeerTempData(bool fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
+{ Need to make it just for a single chamber. No need to pass chamber array.
+    ifstream configFile;
+    string line;
+    size_t found;
+
+    // Get Beer Temperature Data
+    configFile.open(chambers[0].getChamberBeerSensorPath().c_str());
+    if (configFile.is_open())
+    {
+        while (getline(configFile, line))
+        {
+            found = line.find("t=");
+            if (found != string::npos)
+            {
+                if (fahrenheit)
+                {
+                    chambers[0].setCurrentBeerTemp((((((float)(atoi((line.erase(0, (found+2))).c_str()))))*9)+160000)/5000);
+                }
+                else
+                {
+                    chambers[0].setCurrentBeerTemp(((float)(atoi((line.erase(0, (found+2))).c_str())))/1000);
+                }
+                break;
+            }
+        }
+        configFile.close();
+    }
+    else
+    {
+        cout << "Failed to open beer temperature sensor data file!" << endl;
+    }
+}*/
 
 void getTempData(bool fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
 {
@@ -162,6 +244,7 @@ void getTempData(bool fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
                 {
                     chambers[0].setCurrentBeerTemp(((float)(atoi((line.erase(0, (found+2))).c_str())))/1000);
                 }
+                break;
             }
         }
         configFile.close();
@@ -188,6 +271,7 @@ void getTempData(bool fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
                 {
                     chambers[0].setCurrentFridgeTemp(((float)(atoi((line.erase(0, (found+2))).c_str())))/1000);
                 }
+                break;
             }
         }
         configFile.close();
@@ -203,15 +287,15 @@ void getTempData(bool fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
 
 int strToInt(string &strToConvert, string type)
 {
-    int convertedInt = 0, j = 0;
+    int convertedInt = 0, j = 0, retVal = 0;
     int tempNum[NUM_DIGITS_FERM_CHAMBERS];
 
     for (int i = 0; i < strToConvert.length(); ++i)
     {
-        // Check to see if we have 3 numbers after the key word. This puts a limit on chambers to 999.
-        if (j == 3)
+        // Check to see if we have more than NUM_DIGITS_FERM_CHAMBERS after the key word.
+        if (j == NUM_DIGITS_FERM_CHAMBERS)
         {
-            cout << "Too many chambers specified. Error in line of .ini here: " << strToConvert << endl;
+            cout << "Too many chambers specified vs NUM_DIGITS_FERM_CHAMBERS. Error in line of .ini here: " << strToConvert << endl;
             exit(EXIT_FAILURE);
         }
 
@@ -259,6 +343,25 @@ int strToInt(string &strToConvert, string type)
             j++;
             continue;
         default:
+            for (int k = 0; k < NUM_DIGITS_FERM_CHAMBERS; k++)
+            {
+                retVal += tempNum[k] * (10 ^ (NUM_DIGITS_FERM_CHAMBERS - k - 1));
+            }
+            
+            // Checks
+            if (retVal > NUM_OF_FERM_CHAMBERS)
+            {
+                cout << "ERROR: Sensor chambers specified in .ini file exceed NUM_OF_FERM_CHAMBERS!" << endl;
+                exit(EXIT_FAILURE);
+            }
+            else if (retVal < 0)
+            {
+                cout << "ERROR: Incorrect .ini file format!" << endl;
+                exit(EXIT_FAILURE);
+            }
+            
+            return retVal;
+            /*
             if (j == 1)
             {
                 return tempNum[0];
@@ -275,7 +378,7 @@ int strToInt(string &strToConvert, string type)
             {
                 cout << "ERROR: Converting char to int." << endl;
                 exit(EXIT_FAILURE);
-            }
+            }*/
         }
     }
 }

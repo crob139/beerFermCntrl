@@ -2,13 +2,15 @@
 
 class fermChamber
 {
-    // Variable Declarations
 private:
     // This is the name of the beer that the user can specify. Will be shown on web interface.
     string beerName;
 
     // Hold's path to the file containing the sensor's temp data. If NULL, sensor doesn't exist.
     string beerSensorPath, fridgeSensorPath, ambientSensorPath;
+    
+    // Determines whether the chamber has a beer, fridge/chamber, ambient temp sensor.
+    bool hasBeerSensor, hasFridgeSensor, hasAmbientSensor;
 
     // Temperature Data
     float currentBeerTemp, currentFridgeTemp, currentAmbientTemp;      // Current/most recent temperature data reading values.
@@ -31,7 +33,14 @@ public:
     string getChamberFridgeSensorPath(void);
     string getChamberAmbientSensorPath(void);
     void setChamberSensorPath(string path, int id);
-
+    
+    void setHasBeerSensor(bool setValue);
+    void setHasFridgeSensor(bool setValue);
+    void setHasAmbientSensor(bool setValue);
+    bool getHasBeerSensor(void);
+    bool getHasFridgeSensor(void);
+    bool getHasAmbientSensor(void);
+    
     float getCurrentBeerTemp(void);
     float getCurrentFridgeTemp(void);
     float getCurrentAmbientTemp(void);

@@ -14,7 +14,12 @@ fermChamber::fermChamber(void)
     beerSensorPath = "";
     fridgeSensorPath = "";
     ambientSensorPath = "";
-
+    
+    // Set the sensors to false and change as sensors read in from .ini
+    hasBeerSensor = false;
+    hasFridgeSensor = false;
+    hasAmbientSensor = false;
+    
     // The temperature values are initialised to 0.
     currentBeerTemp = 0;
     currentFridgeTemp = 0;
@@ -140,4 +145,29 @@ void fermChamber::setNewPreviousFridgeTemp(void)
 void fermChamber::setNewPreviousAmbientTemp(void)
 {
     previousAmbientTemp = currentAmbientTemp;
+}
+
+void fermChamber::setHasBeerSensor(bool setValue)
+{
+    hasBeerSensor = setValue;
+}
+void fermChamber::setHasFridgeSensor(bool setValue)
+{
+    hasFridgeSensor = setValue;
+}
+void fermChamber::setHasAmbientSensor(bool setValue)
+{
+    hasAmbientSensor = setValue;
+}
+bool fermChamber::getHasBeerSensor(void)
+{
+    return hasBeerSensor;
+}
+bool fermChamber::getHasFridgeSensor(void)
+{
+    return hasFridgeSensor;
+}
+bool fermChamber::getHasAmbientSensor(void)
+{
+    return hasAmbientSensor;
 }
