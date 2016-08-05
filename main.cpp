@@ -17,10 +17,29 @@ int main(void)
 
     init(fahrenheit, chambers); // Do all initialisation. Read .ini file and setup fermentation chambers.
     
-    getTempData(fahrenheit, chambers);
+    for (int i = 0; i < NUM_OF_FERM_CHAMBERS; i++)
+    {
+        // Get beer temp and print it
+        if (chambers[i].getHasBeerSensor())
+        {
+            getBeerTempData(fahrenheit, chambers[i]);
+            cout << "Beer Temp in Chamber " << i << ": " << chambers[i].getCurrentBeerTemp() << endl;
+        }
 
-    cout << "Beer Temp: " << chambers[0].getCurrentBeerTemp() << endl;
-    cout << "Fridge Temp: " << chambers[0].getCurrentFridgeTemp() << endl;
+        // Get chamber temp and print it
+        if (chambers[i].getHasFridgeSensor())
+        {
+            getFridgeTempData(fahrenheit, chambers[i]);
+            cout << "Chamber Temp in Chamber " << i << ": " << chambers[i].getCurrentFridgeTemp() << endl;
+        }
+
+        // Get ambient temp and print it
+        if (chambers[i].getHasAmbientSensor())
+        {
+            getAmbientTempData(fahrenheit, chambers[i]);
+            cout << "Ambient Temp in Chamber " << i << ": " << chambers[i].getCurrentAmbientTemp() << endl;
+        }
+    }
     
     return 0;
 }
@@ -187,48 +206,14 @@ void init(bool &fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
     }
 }
 
-/*void getBeerTempData(bool fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
-{ Need to make it just for a single chamber. No need to pass chamber array.
-    ifstream configFile;
-    string line;
-    size_t found;
-
-    // Get Beer Temperature Data
-    configFile.open(chambers[0].getChamberBeerSensorPath().c_str());
-    if (configFile.is_open())
-    {
-        while (getline(configFile, line))
-        {
-            found = line.find("t=");
-            if (found != string::npos)
-            {
-                if (fahrenheit)
-                {
-                    chambers[0].setCurrentBeerTemp((((((float)(atoi((line.erase(0, (found+2))).c_str()))))*9)+160000)/5000);
-                }
-                else
-                {
-                    chambers[0].setCurrentBeerTemp(((float)(atoi((line.erase(0, (found+2))).c_str())))/1000);
-                }
-                break;
-            }
-        }
-        configFile.close();
-    }
-    else
-    {
-        cout << "Failed to open beer temperature sensor data file!" << endl;
-    }
-}*/
-
-void getTempData(bool fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
+void getBeerTempData(bool fahrenheit, fermChamber &chamberToUpdate)
 {
     ifstream configFile;
     string line;
     size_t found;
 
     // Get Beer Temperature Data
-    configFile.open(chambers[0].getChamberBeerSensorPath().c_str());
+    configFile.open(chamberToUpdate.getChamberBeerSensorPath().c_str());
     if (configFile.is_open())
     {
         while (getline(configFile, line))
@@ -238,11 +223,11 @@ void getTempData(bool fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
             {
                 if (fahrenheit)
                 {
-                    chambers[0].setCurrentBeerTemp((((((float)(atoi((line.erase(0, (found+2))).c_str()))))*9)+160000)/5000);
+                    chamberToUpdate.setCurrentBeerTemp((((((float)(atoi((line.erase(0, (found+2))).c_str()))))*9)+160000)/5000);
                 }
                 else
                 {
-                    chambers[0].setCurrentBeerTemp(((float)(atoi((line.erase(0, (found+2))).c_str())))/1000);
+                    chamberToUpdate.setCurrentBeerTemp(((float)(atoi((line.erase(0, (found+2))).c_str())))/1000);
                 }
                 break;
             }
@@ -253,9 +238,16 @@ void getTempData(bool fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
     {
         cout << "Failed to open beer temperature sensor data file!" << endl;
     }
+}
+
+void getFridgeTempData(bool fahrenheit, fermChamber &chamberToUpdate)
+{
+    ifstream configFile;
+    string line;
+    size_t found;
 
     // Get Fridge Temperature Data
-    configFile.open(chambers[0].getChamberFridgeSensorPath().c_str());
+    configFile.open(chamberToUpdate.getChamberFridgeSensorPath().c_str());
     if (configFile.is_open())
     {
         while (getline(configFile, line))
@@ -265,11 +257,11 @@ void getTempData(bool fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
             {
                 if (fahrenheit)
                 {
-                    chambers[0].setCurrentFridgeTemp((((((float)(atoi((line.erase(0, (found+2))).c_str()))))*9)+160000)/5000);
+                    chamberToUpdate.setCurrentFridgeTemp((((((float)(atoi((line.erase(0, (found+2))).c_str()))))*9)+160000)/5000);
                 }
                 else
                 {
-                    chambers[0].setCurrentFridgeTemp(((float)(atoi((line.erase(0, (found+2))).c_str())))/1000);
+                    chamberToUpdate.setCurrentFridgeTemp(((float)(atoi((line.erase(0, (found+2))).c_str())))/1000);
                 }
                 break;
             }
@@ -280,9 +272,40 @@ void getTempData(bool fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS])
     {
         cout << "Failed to open chamber temperature sensor data file!" << endl;
     }
+}
 
-    // Need to add ambient temperature data. Also need to allow for there being no sensor for each option.
-    // Also need to throw error if no beer0 specified
+void getAmbientTempData(bool fahrenheit, fermChamber &chamberToUpdate)
+{
+    ifstream configFile;
+    string line;
+    size_t found;
+
+    // Get Ambient Temperature Data
+    configFile.open(chamberToUpdate.getChamberAmbientSensorPath().c_str());
+    if (configFile.is_open())
+    {
+        while (getline(configFile, line))
+        {
+            found = line.find("t=");
+            if (found != string::npos)
+            {
+                if (fahrenheit)
+                {
+                    chamberToUpdate.setCurrentAmbientTemp((((((float)(atoi((line.erase(0, (found+2))).c_str()))))*9)+160000)/5000);
+                }
+                else
+                {
+                    chamberToUpdate.setCurrentAmbientTemp(((float)(atoi((line.erase(0, (found+2))).c_str())))/1000);
+                }
+                break;
+            }
+        }
+        configFile.close();
+    }
+    else
+    {
+        cout << "Failed to open chamber temperature sensor data file!" << endl;
+    }
 }
 
 int strToInt(string &strToConvert, string type)
@@ -293,7 +316,7 @@ int strToInt(string &strToConvert, string type)
     for (int i = 0; i < strToConvert.length(); ++i)
     {
         // Check to see if we have more than NUM_DIGITS_FERM_CHAMBERS after the key word.
-        if (j == NUM_DIGITS_FERM_CHAMBERS)
+        if (j > NUM_DIGITS_FERM_CHAMBERS)
         {
             cout << "Too many chambers specified vs NUM_DIGITS_FERM_CHAMBERS. Error in line of .ini here: " << strToConvert << endl;
             exit(EXIT_FAILURE);

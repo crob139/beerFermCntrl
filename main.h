@@ -1,6 +1,6 @@
 #include "fermChamber.h"
 
-#define NUM_OF_FERM_CHAMBERS 3
+#define NUM_OF_FERM_CHAMBERS 1
 
 // This is used to determine how many digits are looked for after sensor type.
 // i.e. if the total number of chambers is 11 it will look for 2 digits after sensor type in .ini (e.g. beer11)
@@ -19,5 +19,7 @@
 #define AMBIENT "ambient"
 
 void init(bool &fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS]);
-void getTempData(bool fahrenheit, fermChamber (&chambers)[NUM_OF_FERM_CHAMBERS]);
+void getBeerTempData(bool fahrenheit, fermChamber &chamberToUpdate);
+void getFridgeTempData(bool fahrenheit, fermChamber &chamberToUpdate);
+void getAmbientTempData(bool fahrenheit, fermChamber &chamberToUpdate);
 int strToInt(string &strToConvert, string type);
