@@ -23,21 +23,21 @@ int main(void)
         if (chambers[i].getHasBeerSensor())
         {
             getBeerTempData(fahrenheit, chambers[i]);
-            cout << "Beer Temp in Chamber " << i << ": " << chambers[i].getCurrentBeerTemp() << endl;
+            cout << "Chamber " << i << " Beer Temp: " << chambers[i].getCurrentBeerTemp() << endl;
         }
 
         // Get chamber temp and print it
         if (chambers[i].getHasFridgeSensor())
         {
             getFridgeTempData(fahrenheit, chambers[i]);
-            cout << "Chamber Temp in Chamber " << i << ": " << chambers[i].getCurrentFridgeTemp() << endl;
+            cout << "Chamber " << i << " Chamber Temp: " << chambers[i].getCurrentFridgeTemp() << endl;
         }
 
         // Get ambient temp and print it
         if (chambers[i].getHasAmbientSensor())
         {
             getAmbientTempData(fahrenheit, chambers[i]);
-            cout << "Ambient Temp in Chamber " << i << ": " << chambers[i].getCurrentAmbientTemp() << endl;
+            cout << "Chamber " << i << " Ambient Temp: " << chambers[i].getCurrentAmbientTemp() << endl;
         }
     }
     
@@ -384,24 +384,6 @@ int strToInt(string &strToConvert, string type)
             }
             
             return retVal;
-            /*
-            if (j == 1)
-            {
-                return tempNum[0];
-            }
-            else if (j == 2)
-            {
-                return tempNum[0]*10 + tempNum[1];
-            }
-            else if (j == 3)
-            {
-                return tempNum[0]*100 + tempNum[1]*10 + tempNum[2];
-            }
-            else
-            {
-                cout << "ERROR: Converting char to int." << endl;
-                exit(EXIT_FAILURE);
-            }*/
         }
     }
 }
