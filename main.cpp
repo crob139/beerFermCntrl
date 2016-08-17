@@ -17,27 +17,30 @@ int main(void)
 
     init(fahrenheit, chambers); // Do all initialisation. Read .ini file and setup fermentation chambers.
     
-    for (int i = 0; i < NUM_OF_FERM_CHAMBERS; i++)
+    while (true)
     {
-        // Get beer temp and print it
-        if (chambers[i].getHasBeerSensor())
+        for (int i = 0; i < NUM_OF_FERM_CHAMBERS; i++)
         {
-            getBeerTempData(fahrenheit, chambers[i]);
-            cout << "Chamber " << i << " Beer Temp: " << chambers[i].getCurrentBeerTemp() << endl;
-        }
+            // Get beer temp and print it
+            if (chambers[i].getHasBeerSensor())
+            {
+                getBeerTempData(fahrenheit, chambers[i]);
+                cout << "Chamber " << i << " Beer Temp: " << chambers[i].getCurrentBeerTemp() << endl;
+            }
 
-        // Get chamber temp and print it
-        if (chambers[i].getHasFridgeSensor())
-        {
-            getFridgeTempData(fahrenheit, chambers[i]);
-            cout << "Chamber " << i << " Chamber Temp: " << chambers[i].getCurrentFridgeTemp() << endl;
-        }
+            // Get chamber temp and print it
+            if (chambers[i].getHasFridgeSensor())
+            {
+                getFridgeTempData(fahrenheit, chambers[i]);
+                cout << "Chamber " << i << " Chamber Temp: " << chambers[i].getCurrentFridgeTemp() << endl;
+            }
 
-        // Get ambient temp and print it
-        if (chambers[i].getHasAmbientSensor())
-        {
-            getAmbientTempData(fahrenheit, chambers[i]);
-            cout << "Chamber " << i << " Ambient Temp: " << chambers[i].getCurrentAmbientTemp() << endl;
+            // Get ambient temp and print it
+            if (chambers[i].getHasAmbientSensor())
+            {
+                getAmbientTempData(fahrenheit, chambers[i]);
+                cout << "Chamber " << i << " Ambient Temp: " << chambers[i].getCurrentAmbientTemp() << endl;
+            }
         }
     }
     
